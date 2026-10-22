@@ -1,6 +1,6 @@
 import unittest
 
-from research import select_candidates, normalize_name, match_parliamentarian
+from research import select_candidates, normalize_name, match_parliamentarian, person_from_candidate, summarize_history
 
 
 class ResearchTest(unittest.TestCase):
@@ -34,6 +34,36 @@ class ResearchTest(unittest.TestCase):
     def test_ambiguous_match_does_not_guess(self):
         person = {'name': 'Ana', 'fullName': 'Ana', 'state': 'SP'}
         self.assertIsNone(match_parliamentarian(person, [person | {'id': '1'}, person | {'id': '2'}]))
+
+    def test_keeps_latest_round_without_merging_distinct_elections(self):
+        first = self.candidate(CD_ELEICAO='100', NR_TURNO='1')
+        second = first | {'NR_TURNO': '2'}
+        other = first | {'CD_ELEICAO': '200'}
+        selected = select_candidates([second, first, other])
+        self.assertEqual(len(selected), 2)
+        self.assertEqual(selected[0]['NR_TURNO'], '2')
+
+    def test_latest_round_result_replaces_earlier_result(self):
+        first = self.candidate()
+        last = first | {'NR_TURNO': '2', 'DS_SIT_TOT_TURNO': 'NÃO ELEITO'}
+        self.assertEqual(select_candidates([first, last]), [])
+
+    def test_cleans_tse_placeholders_and_spacing_without_losing_number(self):
+        row = self.candidate(NM_URNA_CANDIDATO=' #NULO ', NM_CANDIDATO=' ANA  SILVA ',
+                             SG_PARTIDO='#NE', NR_CANDIDATO='0', electionSource='https://example.org')
+        person = person_from_candidate(row)
+        self.assertEqual(person['name'], 'ANA SILVA')
+        self.assertEqual(person['party'], '')
+        self.assertEqual(person['number'], '0')
+        self.assertEqual(person['electionYear'], 2026)
+        self.assertEqual(person['round'], 1)
+        self.assertEqual(normalize_name(' João   Azevêdo\nLins '), 'JOAO AZEVEDO LINS')
+
+    def test_summarizes_coauthorship_without_counting_it_as_unique_bills(self):
+        people = [{'history': [{'id': 'camara-1'}, {'id': 'camara-2'}], 'historyStatus': 'Consulta oficial concluída'},
+                  {'history': [{'id': 'camara-1'}], 'historyStatus': 'Coleta indisponível (HTTPError)'}]
+        self.assertEqual(summarize_history(people), {'historyRecords': 3, 'uniqueHistoryRecords': 2, 'historyFailures': 1})
+        self.assertEqual(summarize_history([]), {'historyRecords': 0, 'uniqueHistoryRecords': 0, 'historyFailures': 0})
 
 
 if __name__ == '__main__':

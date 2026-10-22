@@ -22,18 +22,28 @@ OFFICES = {'SENADOR': 'Senado', 'DEPUTADO FEDERAL': 'Deputado federal',
 
 
 def select_candidates(rows: list[Record]) -> list[Record]:
-    selected: dict[str, Record] = {}
+    latest: dict[tuple[str, str], Record] = {}
     for row in rows:
+        key = (row.get('CD_ELEICAO', ''), row['SQ_CANDIDATO'])
+        if key not in latest or int(row['NR_TURNO']) > int(latest[key]['NR_TURNO']):
+            latest[key] = row
+    selected: list[Record] = []
+    for row in latest.values():
         is_pb = row['SQ_CANDIDATO'] in PB_IDS and row['SG_UF'] == 'PB' and row['DS_CARGO'] == 'SENADOR'
         is_president = row['DS_CARGO'] == 'PRESIDENTE' and row['NM_URNA_CANDIDATO'] in {'LULA', 'FLAVIO BOLSONARO'}
         is_elected = row['DS_CARGO'] in OFFICES and row['DS_SIT_TOT_TURNO'].startswith('ELEITO')
         if is_pb or is_president or is_elected:
-            selected.setdefault(row['SQ_CANDIDATO'], row | {'electionSource': PB_SOURCE if is_pb else ELECTION_SOURCE})
-    return list(selected.values())
+            selected.append(row | {'electionSource': PB_SOURCE if is_pb else ELECTION_SOURCE})
+    return selected
+
+
+def normalize_tse_text(value: str) -> str:
+    cleaned = ' '.join(value.split())
+    return '' if cleaned.upper() in {'#NULO', '#NE', 'NÃO DIVULGÁVEL', '-1', '-3', '-4'} else cleaned
 
 
 def normalize_name(name: str) -> str:
-    return ''.join(c for c in unicodedata.normalize('NFD', name.upper()) if not unicodedata.combining(c)).strip()
+    return ''.join(c for c in unicodedata.normalize('NFD', normalize_tse_text(name).upper()) if not unicodedata.combining(c))
 
 
 def match_parliamentarian(person: Record, roster: list[Record]) -> Record | None:
@@ -78,11 +88,19 @@ def current_rosters() -> list[Record]:
 
 
 def person_from_candidate(row: Record) -> Record:
-    return {'id': row['SQ_CANDIDATO'], 'name': row['NM_URNA_CANDIDATO'], 'fullName': row['NM_CANDIDATO'],
-            'office': OFFICES[row['DS_CARGO']], 'state': row['SG_UF'], 'party': row['SG_PARTIDO'],
-            'number': row['NR_CANDIDATO'], 'result': 'Disputa presidencial' if row['DS_CARGO'] == 'PRESIDENTE' else 'Eleito em 2026',
+    full_name = normalize_tse_text(row['NM_CANDIDATO'])
+    return {'id': row['SQ_CANDIDATO'], 'name': normalize_tse_text(row['NM_URNA_CANDIDATO']) or full_name, 'fullName': full_name,
+            'electionId': row.get('CD_ELEICAO', ''), 'round': int(row['NR_TURNO']), 'electionYear': 2026,
+            'office': OFFICES[row['DS_CARGO']], 'state': row['SG_UF'], 'party': normalize_tse_text(row['SG_PARTIDO']),
+            'number': normalize_tse_text(row['NR_CANDIDATO']), 'result': 'Disputa presidencial' if row['DS_CARGO'] == 'PRESIDENTE' else 'Eleito em 2026',
             'electionSource': row['electionSource'], 'socialSources': [], 'history': [],
             'campaignStatus': 'Pesquisa de promessas pendente', 'historyStatus': 'Histórico individual ainda não coletado'}
+
+
+def summarize_history(people: list[Record]) -> dict[str, int]:
+    return {'historyRecords': sum(len(p['history']) for p in people),
+            'uniqueHistoryRecords': len({h['id'] for p in people for h in p['history']}),
+            'historyFailures': sum(p['historyStatus'].startswith('Coleta indisponível') for p in people)}
 
 
 def collect_history(person: Record) -> Record:
@@ -132,9 +150,8 @@ def collect_research() -> None:
     metadata = {'checkedAt': '2026-10-21', 'tseGeneratedAt': rows[0]['DT_GERACAO'] + ' ' + rows[0]['HH_GERACAO'],
                 'source': ELECTION_SOURCE, 'counts': dict(Counter(p['office'] for p in people)),
                 'historyPeople': sum(bool(p['member']) for p in people),
-                'historyRecords': sum(len(p['history']) for p in people),
                 'socialPeople': sum(bool(p['socialSources']) for p in people),
-                'historyFailures': sum(p['historyStatus'].startswith('Coleta indisponível') for p in people),
+                **summarize_history(people),
                 'notes': ['Senadores da PB confirmados pela Agência Senado; situação nula no CSV do TSE.',
                           'Identificação entre bases por nome exato normalizado e UF; sem correspondência ambígua.',
                           'Histórico legislativo de 2026 somente para correspondências nas listas atuais da Câmara e do Senado.',
@@ -150,9 +167,7 @@ def finalize_snapshot() -> None:
     for person in snapshot['people']:
         person['history'] = [entry for entry in person['history'] if '2026-01-01' <= entry['date'] <= '2026-10-21']
     snapshot['metadata']['checkedAt'] = '2026-10-22'
-    snapshot['metadata']['historyRecords'] = sum(len(p['history']) for p in snapshot['people'])
-    snapshot['metadata']['uniqueHistoryRecords'] = len({h['id'] for p in snapshot['people'] for h in p['history']})
-    snapshot['metadata']['historyFailures'] = sum(p['historyStatus'].startswith('Coleta indisponível') for p in snapshot['people'])
+    snapshot['metadata'].update(summarize_history(snapshot['people']))
     target.write_text(json.dumps(snapshot, ensure_ascii=False, separators=(',', ':')))
     print(json.dumps(snapshot['metadata'], ensure_ascii=False))
 
