@@ -33,6 +33,22 @@ node --test tests/*.test.mjs
 python3 -m unittest discover -s tests -p '*_test.py'
 ```
 
+Os testes dos documentos exigem `pdftotext`, do pacote Poppler (`poppler-utils` no Debian/Ubuntu).
+
+## Programas completos e reutilização de dados
+
+[Índice dos programas por página](dist/documents/index.json): texto das 102 páginas dos programas de Bolsonaro 2018 e Lula 2022, com identificador da candidatura, ano, URL do arquivo oficial, entrada no ZIP e SHA-256 do PDF. O texto foi extraído automaticamente e deve ser conferido no original; a numeração corresponde à posição da página no PDF. Esse índice não transforma parágrafos em promessas nem atribui cumprimento.
+
+Para regenerar o índice a partir dos PDFs versionados:
+
+```sh
+python3 documents.py
+```
+
+As melhorias inspiradas nas referências abertas incluem limpeza de valores ausentes do TSE e espaços nos nomes, preservação do último turno por eleição e candidatura, e contagem separada de proposições únicas e relações de autoria. Eleição não comprova exercício atual do cargo. A vinculação às bases legislativas continua exigindo nome e UF sem ambiguidade.
+
+Veja [fontes, licenças e decisões de aproveitamento](SOURCES.md). As implementações são próprias; não há dependência dos serviços de terceiros nem código transplantado desses repositórios.
+
 ## Arquivos principais
 
 | Caminho | Conteúdo |
@@ -44,6 +60,7 @@ python3 -m unittest discover -s tests -p '*_test.py'
 | `dist/assessments.json` | Avaliações editoriais, critérios e evidências |
 | `dist/documents/` | PDFs originais dos programas do TSE |
 | `research.py` | Coleta de dados oficiais e programas históricos |
+| `documents.py`, `dist/documents/index.json` | Extração reproduzível e corpus dos programas por página |
 | `.openai/hosting.json` | Identidade e configuração do site existente no Sites |
 
 Os recortes e datas da coleta estão fixados no código e nos dados. Atualizá-los exige conferir as fontes e as avaliações correspondentes; a publicação não executa coleta automática.
