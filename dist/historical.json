@@ -1,0 +1,25 @@
+{
+  "checkedAt":"2026-10-22",
+  "people":[
+    {"id":"280000614517","name":"JAIR BOLSONARO","fullName":"JAIR MESSIAS BOLSONARO","office":"Presidência","state":"BR","party":"PSL","number":"17","result":"Eleito em 2018","electionYear":2018,"term":"2019–2022","electionSource":"https://dadosabertos.tse.jus.br/dataset/candidatos-2018","socialSources":[],"history":[],"historyStatus":"Avaliações documentadas em 22/10/2026","planSource":"./documents/bolsonaro-2018.pdf","archiveSource":"https://cdn.tse.jus.br/estatistica/sead/odsele/proposta_governo/proposta_governo_2018_BR.zip","archiveEntry":"BR/2018BR280000614517.pdf","planPages":81},
+    {"id":"280001607829","name":"LULA","fullName":"LUIZ INÁCIO LULA DA SILVA","office":"Presidência","state":"BR","party":"PT","number":"13","result":"Eleito em 2022","electionYear":2022,"term":"2023–2026","electionSource":"https://dadosabertos.tse.jus.br/dataset/candidatos-2022","socialSources":[],"history":[],"historyStatus":"Avaliações documentadas em 22/10/2026","planSource":"./documents/lula-2022.pdf","archiveSource":"https://cdn.tse.jus.br/estatistica/sead/odsele/proposta_governo/proposta_governo_2022_BR.zip","archiveEntry":"BR/2022BR280001607829.pdf","planPages":21}
+  ],
+  "campaigns":[
+    {"personId":"280000614517","title":"Reduzir a dívida com venda de ativos públicos","area":"ECONOMIA","description":"Estimar redução de 20% da dívida por privatizações, concessões e alienação de ativos.","page":56},
+    {"personId":"280000614517","title":"Introduzir capitalização individual na Previdência","area":"PREVIDÊNCIA","description":"Reformar o regime e introduzir gradualmente contas individuais, com opção para novos participantes.","page":57},
+    {"personId":"280000614517","title":"Simplificar e unificar tributos federais","area":"TRIBUTAÇÃO","description":"Eliminar distorções e aumentar a eficiência da arrecadação.","page":58},
+    {"personId":"280000614517","title":"Instituir renda mínima acima do Bolsa Família","area":"ASSISTÊNCIA","description":"Modernizar o Bolsa Família e o abono salarial em direção a uma renda mínima.","page":63},
+    {"personId":"280000614517","title":"Criar prontuário eletrônico nacional interligado","area":"SAÚDE","description":"Informatizar unidades e integrar os dados dos atendimentos.","page":39},
+    {"personId":"280000614517","title":"Reformular o Estatuto do Desarmamento","area":"SEGURANÇA","description":"Alterar o estatuto com foco na legítima defesa do cidadão.","page":32},
+    {"personId":"280000614517","title":"Reduzir a maioridade penal para 16 anos","area":"SEGURANÇA","description":"Propor alteração da idade de responsabilização penal.","page":32},
+    {"personId":"280000614517","title":"Vender ativos de refino e outras atividades da Petrobras","area":"ENERGIA","description":"Alienar parcela substancial de atividades com poder de mercado para promover concorrência.","page":74},
+    {"personId":"280001607829","title":"Retomar a valorização do salário mínimo","area":"TRABALHO","description":"Recuperar o poder de compra dos trabalhadores e beneficiários previdenciários e assistenciais.","page":4,"item":"16"},
+    {"personId":"280001607829","title":"Renovar e ampliar o Bolsa Família","area":"ASSISTÊNCIA","description":"Garantir renda compatível com as necessidades da população e ampliar a cobertura.","page":5,"item":"20"},
+    {"personId":"280001607829","title":"Propor nova legislação de proteção ao trabalho","area":"TRABALHO","description":"Abranger diferentes ocupações, incluindo trabalho autônomo e por aplicativos.","page":4,"item":"13"},
+    {"personId":"280001607829","title":"Revogar o teto de gastos e construir novo regime fiscal","area":"ECONOMIA","description":"Rever as regras fiscais com sustentabilidade, previsibilidade e atuação anticíclica.","page":10,"item":"51–52"},
+    {"personId":"280001607829","title":"Propor reforma tributária progressiva","area":"TRIBUTAÇÃO","description":"Simplificar tributos, reduzir a carga sobre consumo e ampliar a progressividade.","page":11,"item":"53"},
+    {"personId":"280001607829","title":"Retomar Mais Médicos e Farmácia Popular","area":"SAÚDE","description":"Fortalecer o SUS público e universal e recuperar essas políticas de saúde.","page":6,"item":"24"},
+    {"personId":"280001607829","title":"Combater desmatamento ilegal e promover desmatamento líquido zero","area":"MEIO AMBIENTE","description":"Combater crimes ambientais e recompor áreas degradadas com reflorestamento.","page":17,"item":"94"},
+    {"personId":"280001607829","title":"Retomar o programa nacional de vacinação","area":"SAÚDE","description":"Recuperar a vacinação e o atendimento às demandas represadas na pandemia.","page":6,"item":"23"}
+  ]
+}
